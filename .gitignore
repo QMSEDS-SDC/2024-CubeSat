@@ -1,0 +1,12 @@
+# Byte-compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE settings
+.idea/
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
