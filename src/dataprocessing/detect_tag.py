@@ -31,7 +31,7 @@ def image_valid(img: np.ndarray) -> int:
 
 def detect_aruco(
     img: np.ndarray, aruco_dict: cv2.aruco.Dictionary, aruco_parameters: cv2.aruco.DetectorParameters,
-    calibration: Dict[str, List[float]], debug: bool = False
+    calibration: Dict[str, List[float]], marker_side_cm: float, debug: bool = False
 ) -> Dict[str, List[float]]:
 
     """
@@ -44,11 +44,13 @@ def detect_aruco(
         - calibration:
             - "camera_mat": [fx, fy, cx, cy]
             - "distortion_mat": [k1, k2, p1, p2, k3]
+        - marker_side_cm: The side length of the marker in cm
         - debug (false): allows viewing of the detected tag, but debug purposes
 
     Returns:
         - {}: ArUco tag not detected
-        - {"Translation" : [tx, ty, tz], "Rotational": [rx, ry, rz]}
+        - {"Translation" : [tx, ty, tz], "Rotational": [rx, ry, rz], - "corners": corner data
+            - "id": ids}
         - if debug=True:
             - {"Result": (corners, ids, rejecteds)} -- only for debugging purposes
 
@@ -79,3 +81,15 @@ def detect_aruco(
     # no ids found
     if ids is None:
         return {}
+
+    fx, fy, cx, cy = tuple(calibration["camera_mat"])
+    true_cam_mat = np.array([
+        [fx, 0, cx],
+        [0, fy, cy],
+        [0, 0, 1],
+    ])
+    true_dist_coeff = np.array([calibration["distortion_mat"]])
+
+    rvecs, tvecs, _ = cv2.aruco.estimatePoseSingleMarkers(corners, marker_side_cm, true_cam_mat, true_dist_coeff)
+
+    return {"Translation": tvecs, "Rotational": rvecs, "Corners": corners, "IDs": ids}
