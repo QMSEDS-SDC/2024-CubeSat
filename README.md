@@ -8,9 +8,9 @@ This repository contains the codebase for the CubeSat's On-Board Computer (OBC).
 
 #### **Phase 2: AOCS Check**
 
-- **Image Recognition**: 
+- **Image Recognition**:
   - Detect card cutouts and identify numbers written on the cards.
-- **Data Processing**: 
+- **Data Processing**:
   - Calculate the position of the cards and provide inputs to the AOCS system.
 
 #### **Phase 3: Main Testing**
