@@ -27,10 +27,10 @@ def generate_samples(
         - List of images choosen
 
     Exceptions:
-        - ValueError: If required_number < 10 as per the OpenCV documentation atleast 10 samples are required to 
+        - ValueError: If required_number < 10 as per the OpenCV documentation atleast 10 samples are required to
                       calibrate the camera
 
-    Note: 
+    Note:
         - Use a printed chessboard or a real chessboard but it must me kept straight.
         - Only select the image if all the points are properly detected, else just don't
         - If you have the time less than one second, then there is a chance a image with no detected grid may be choosen
