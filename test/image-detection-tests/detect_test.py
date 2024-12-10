@@ -20,6 +20,7 @@ cap = cv2.VideoCapture(0)  # default
 if not cap.isOpened():
     raise RuntimeError("Camera Unavailable")
 
+counter = 0
 while True:
     ret, frame = cap.read()
 
@@ -53,6 +54,12 @@ while True:
             cv2.drawFrameAxes(
                 frame, true_cam_mat, true_dist_coeff, rvec, tvec, side_len * 0.5
             )
+
+        if counter % 100 == 0:
+            print("Translational (cm) = {}".format(tvecs))
+            print("Rotational (degrees) = {}".format(rvec))
+
+        counter += 1
 
     cv2.imshow("Camera Feed", frame)
     if cv2.waitKey(1) == ord("q"):
