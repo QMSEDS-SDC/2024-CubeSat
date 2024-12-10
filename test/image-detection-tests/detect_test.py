@@ -16,6 +16,17 @@ while True:
     if not ret:
         raise RuntimeError("Error with camera feed")
 
+    grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    tag_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_1000)
+    tag_parameters = cv2.aruco.DetectorParameters()
+
+    output = detect_aruco(grey, tag_dict, tag_parameters, {}, debug=True)
+    if output == {}:
+        print("None Detected")
+    else:
+        corners, ids, rejected = output["Result"]
+        cv2.aruco.drawDetectedMarkers(frame, corners, ids)
+
     cv2.imshow("Camera Feed", frame)
     if cv2.waitKey(1) == ord("q"):
         break
