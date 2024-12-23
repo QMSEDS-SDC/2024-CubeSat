@@ -2,7 +2,7 @@
 Tests the detection of the number cards from a live camera feed
 """
 
-from src.dataprocessing.detect_cards import detect_card  # run with repo root as working dir
+from src.dataprocessing.processing.detect_cards import detect_card  # run with repo root as working dir
 from misc.use_camera import start_camera, stop_camera, get_frame
 import numpy as np
 import cv2

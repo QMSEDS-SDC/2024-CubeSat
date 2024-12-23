@@ -2,7 +2,7 @@
 Tests the detection of the Fiducial tags from a live camera feed
 """
 
-from src.dataprocessing.detect_tag import detect_aruco  # run with repo root as working dir
+from src.dataprocessing.processing.detect_tag import detect_aruco  # run with repo root as working dir
 from misc.use_camera import start_camera, stop_camera, get_frame
 import numpy as np
 import cv2
