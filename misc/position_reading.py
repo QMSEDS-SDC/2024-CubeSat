@@ -65,6 +65,3 @@ while True:
     if cv2.waitKey(1) == ord("q"):
         stop_camera(cap)
         break
-
-cap.release()
-cv2.destroyAllWindows()

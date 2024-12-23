@@ -3,9 +3,8 @@ Detects cards (rectangles) in an image and if detected then detects the number p
 """
 
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-from typing import Tuple, List, Dict
+from typing import Tuple, List
 
 
 def image_valid(img: np.ndarray) -> int:
