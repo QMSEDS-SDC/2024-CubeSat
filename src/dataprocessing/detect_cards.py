@@ -85,3 +85,25 @@ def detect_card_contours(
             result.append((x, y, w, h))
 
     return result
+
+
+def detect_card_numbers(
+    img: np.ndarray, card_cnts: List[Tuple(float, float, float, float)]
+) -> Dict[str, Tuple[Tuple(float, float, float, float), int]]:
+
+    """
+    Detects the number present on the card
+
+    Parameters:
+        - img: The image array (needs to be greyscale)
+        - card_cnts: The contours of the cards
+
+    Returns:
+        - {
+            "Number": (
+                (x_point, y_point, width, height), detected_number
+            )
+        }
+    """
+
+    return {}
