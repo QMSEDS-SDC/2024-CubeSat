@@ -3,6 +3,7 @@ Tests the detection of the Fiducial tags from a live camera feed
 """
 
 from src.dataprocessing.detect_tag import detect_aruco  # run with repo root as working dir
+from misc.use_camera import start_camera, stop_camera, get_frame
 import numpy as np
 import cv2
 
@@ -13,19 +14,18 @@ the_coefficients = {
         0.39370256196311587, -1.8790623794035874, -0.004784372375460338, -1.9735858217122795e-05, 2.3541810896089586
     ]
 }
-side_len = 5  # sample provided by the guys at sdc
+side_len = 5  # sample provided by the guys at sdc (cm)
 
-cap = cv2.VideoCapture(0)  # default
-
-if not cap.isOpened():
-    raise RuntimeError("Camera Unavailable")
+# default, change it to the video feed from mobile if that is something you find interesting
+# note when using a http feed, the feed should be in the form of http://<ip>:<port>/video
+inp = input("Enter the camera feed url (0 = default laptop one): ")
+if inp == "0":
+    inp = 0
+cap = start_camera(inp)
 
 counter = 0
 while True:
-    ret, frame = cap.read()
-
-    if not ret:
-        raise RuntimeError("Error with camera feed")
+    frame = get_frame(cap)
 
     grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     tag_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_5X5_1000)
@@ -63,6 +63,7 @@ while True:
 
     cv2.imshow("Camera Feed", frame)
     if cv2.waitKey(1) == ord("q"):
+        stop_camera(cap)
         break
 
 cap.release()
