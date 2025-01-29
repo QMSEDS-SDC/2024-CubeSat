@@ -54,6 +54,10 @@ def detect_card_contours(
             - A.1: if the algorithm is invalid or not implemented
             - A.2: if the arguments supplied are invalid for the canny algorithm
             - A.3: if the arguments supplied are invalid for finding contours
+
+    Note:
+        - Though testing, its seems unless the lens really distorts the image - like FishEye, it should be fine
+        if the distortion matrix is not provided
     """
 
     img_validity = image_valid(img)
