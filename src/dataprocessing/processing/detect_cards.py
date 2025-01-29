@@ -124,7 +124,7 @@ def choose_card_contours(
 def draw_card_contours(
     img: np.ndarray, card_cnts: List[Tuple[float, float, float, float]], colour: Tuple[int, int, int] = (0, 255, 0),
     thickness: int = 3
-    ) -> np.ndarray:
+) -> np.ndarray:
 
     """
     Draws the detected card contours on the image
@@ -138,8 +138,7 @@ def draw_card_contours(
     """
 
     x, y, w, h = card_cnts
-    return cv2.rectangle(img, (x, y), (x + w, y + h), colour, thickness) 
-
+    return cv2.rectangle(img, (x, y), (x + w, y + h), colour, thickness)
 
 
 def detect_card_numbers(

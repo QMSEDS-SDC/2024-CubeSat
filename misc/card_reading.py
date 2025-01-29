@@ -5,7 +5,6 @@ Tests the detection of the number cards from a live camera feed
 # run with repo root as working dir
 from src.dataprocessing.processing.detect_cards import detect_card_contours, draw_card_contours, choose_card_contours
 from misc.use_camera import start_camera, stop_camera, get_frame
-import numpy as np
 import cv2
 
 

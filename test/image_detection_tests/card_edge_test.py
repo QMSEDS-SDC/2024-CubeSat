@@ -4,8 +4,7 @@ Tests the card edge detection
 
 import cv2
 import matplotlib.pyplot as plt
-import numpy as np
-import unittest
+# import unittest
 from src.dataprocessing.processing.detect_cards import detect_card_contours, draw_card_contours, choose_card_contours
 
 files = ["test\\image_detection_tests\\img\\card-edge-sample.webp"]
