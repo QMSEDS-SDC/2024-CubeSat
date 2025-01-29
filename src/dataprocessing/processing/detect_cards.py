@@ -81,11 +81,36 @@ def detect_card_contours(
         w_min, w_max = width_range
         h_min, h_max = height_range
         x, y, w, h = cv2.boundingRect(cnt)
-        print(x, y, w, h)
-        print(w_min >= w >= w_max, h_min >= h >= h_max)
         if w_min <= w <= w_max and h_min <= h <= h_max:
-            print("Found")
             result.append((x, y, w, h))
+
+    return result
+
+
+def choose_card_contours(
+    card_cnts: List[Tuple[float, float, float, float]], max_tolerence: int = 0.8
+) -> Tuple[float, float, float, float]:
+    """
+    Chooses the best card contour(s) from the list of card contours
+
+    Parameters:
+        - card_cnts: The list of card contours
+        - max_tolerence: The maximum tolerence for the best card contour
+
+    Returns:
+        - The best card contour
+    """
+
+    dict_cnts = {}
+    for cnts in card_cnts:
+        x, y, w, h = cnts
+        dict_cnts[cnts] = w * h
+
+    result = []
+
+    for key in dict_cnts:
+        if dict_cnts[key] > max(dict_cnts.values()) * max_tolerence:
+            result.append(key)
 
     return result
 
