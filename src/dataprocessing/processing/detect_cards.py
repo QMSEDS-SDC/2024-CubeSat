@@ -62,6 +62,8 @@ def detect_card_contours(
     elif img_validity == -2:
         raise ValueError("Error I.2: Image Array format is invalid")
 
+    img = cv2.GaussianBlur(img, (5, 5), 0)
+
     if algo == "canny":
         if len(args) != 2:
             raise ValueError("Error A.2: Invalid Arguments for Canny Algorithm")

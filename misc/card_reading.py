@@ -21,11 +21,13 @@ while True:
     shape = frame.shape
 
     grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    result = detect_card_contours(grey, (shape[1]//10, shape[1]//2), (shape[0]//10, shape[0]//2), (100, 200))
-    result = choose_card_contours(result)    
-    for vals in result:
-        x, y, w, h = vals
-        result_img = draw_card_contours(grey, (x, y, w, h))
+    result = detect_card_contours(grey, (0, shape[1]), (0, shape[0]), (100, 200))
+    result = choose_card_contours(result)
+    result_img = grey
+    if result != []:
+        for vals in result:
+            x, y, w, h = vals
+            result_img = draw_card_contours(grey, (x, y, w, h))
 
     cv2.imshow("frame", result_img)
 
