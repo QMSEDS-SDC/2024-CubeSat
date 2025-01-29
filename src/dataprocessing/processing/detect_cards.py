@@ -28,9 +28,9 @@ def image_valid(img: np.ndarray) -> int:
 
 
 def detect_card_contours(
-    img: np.ndarray, width_range: Tuple(int, int), height_range: Tuple(int, int), args: Tuple[int], algo: str = "canny",
-    find_cnts: Tuple(str, str) = (cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-) -> List[Tuple(float, float, float, float)]:
+    img: np.ndarray, width_range: Tuple[int, int], height_range: Tuple[int, int], args: Tuple[int], algo: str = "canny",
+    find_cnts: Tuple[str, str] = (cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+) -> List[Tuple[float, float, float, float]]:
     """
     Detects card (rectangular) contours in an image
 
@@ -44,7 +44,7 @@ def detect_card_contours(
         - find_cnts: The arguments for finding contours (default: (cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE))
 
     Returns:
-        - img: The image array with detected rectangles drawn
+        - img: Coordinates of results (x, y, width, height)
 
     Exceptions:
         - ValueError
@@ -81,15 +81,39 @@ def detect_card_contours(
         w_min, w_max = width_range
         h_min, h_max = height_range
         x, y, w, h = cv2.boundingRect(cnt)
-        if w_min >= w >= w_max and h_min >= h >= h_max:
+        print(x, y, w, h)
+        print(w_min >= w >= w_max, h_min >= h >= h_max)
+        if w_min <= w <= w_max and h_min <= h <= h_max:
+            print("Found")
             result.append((x, y, w, h))
 
     return result
 
 
+def draw_card_contours(
+    img: np.ndarray, card_cnts: List[Tuple[float, float, float, float]], colour: Tuple[int, int, int] = (0, 255, 0),
+    thickness: int = 3
+    ) -> np.ndarray:
+
+    """
+    Draws the detected card contours on the image
+
+    Parameters:
+        - img: The image array (needs to be greyscale)
+        - card_cnts: The contours of the cards
+
+    Returns:
+        - img: The image with the contours drawn on it
+    """
+
+    x, y, w, h = card_cnts
+    return cv2.rectangle(img, (x, y), (x + w, y + h), colour, thickness) 
+
+
+
 def detect_card_numbers(
-    img: np.ndarray, card_cnts: List[Tuple(float, float, float, float)]
-) -> Dict[str, Tuple[Tuple(float, float, float, float), int]]:
+    img: np.ndarray, card_cnts: List[Tuple[float, float, float, float]]
+) -> Dict[str, Tuple[Tuple[float, float, float, float], int]]:
 
     """
     Detects the number present on the card
