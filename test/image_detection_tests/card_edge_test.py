@@ -20,7 +20,9 @@ result = choose_card_contours(result)
 
 for vals in result:
     x, y, w, h = vals
-    result_img = draw_card_contours(grey, (x, y, w, h))
+    result_img = draw_card_contours(frame, (x, y, w, h))
 
-plt.imshow(result_img, cmap='gray')
+result_img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+plt.imshow(result_img)
 plt.show()
