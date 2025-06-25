@@ -1,5 +1,5 @@
 {
-    "GROUND_HOST": "10.63.215.45",
+    "GROUND_HOST": "ground-station.local",
     "SEND_PORT": 8080,
     "RECEIVE_PORT": 8090
 }

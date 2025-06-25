@@ -2,41 +2,36 @@ import socket
 import json
 import os
 
-# Load configuration from env_values.json
-config_path = os.path.join(os.path.dirname(__file__), '..', 'env_values.json')
-with open(config_path, 'r') as f:
-    config = json.load(f)
-
-# Auto-detect server's own IPv4 address
-
 
 def get_local_ip():
-    # Create a temporary socket to determine local IP
-    temp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        # Connect to a remote address (doesn't actually send data)
-        temp_socket.connect(('8.8.8.8', 80))
-        local_ip = temp_socket.getsockname()[0]
+        # Doesn't have to be reachable
+        s.connect(('10.255.255.255', 1))
+        ip = s.getsockname()[0]
     except Exception:
-        local_ip = '127.0.0.1'  # fallback to localhost
+        ip = '127.0.0.1'
     finally:
-        temp_socket.close()
-    return local_ip
+        s.close()
+    return ip
 
 
-HOST = get_local_ip()
-PORT = config['SEND_PORT']
+# Load ports from env_values.json
+env_path = os.path.join(os.path.dirname(__file__), 'env_values.json')
+with open(env_path, 'r') as f:
+    env = json.load(f)
+send_port = env['SEND_PORT']
 
-print(f"Server starting on {HOST}:{PORT}")
+local_ip = get_local_ip()
+print(f"Server will bind to IP: {local_ip}, Port: {send_port}")
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST, PORT))
-s.listen()
-conn, addr = s.accept()
-print('Connected by', addr)
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((local_ip, send_port))
+server_socket.listen(5)
+print("Server listening...")
+
 while True:
-    data = conn.recv(1024)
-    if not data:
-        break
-    conn.sendall(data)
-conn.close()
+    client_socket, addr = server_socket.accept()
+    print(f"Connection from {addr}")
+    client_socket.sendall(b"Hello from server!\n")
+    client_socket.close()
