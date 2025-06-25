@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <raspicam/raspicam.h>
+#include <unistd.h> 
 using namespace std;
 
 class Camera {
