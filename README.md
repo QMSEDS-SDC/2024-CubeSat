@@ -31,35 +31,24 @@ The repository includes implementations for:
 
 The message will be in the form of:
 
-1. **Header:** Kind of information it is
+1. **Type:** Kind of information it is
 2. **Message:** The message
 
-The messages come under the following classification:
+The different types are (they will be values of their respective keys, so format is value1: value2):
 
-1. Ground -> CubeSat
-   1. Command
-      1. Initiate Phase 1
-      2. Initiate Phase 2
-      3. Initiate Phase 3
-   2. Give at a Glance Info - Give data based on config
-   3. Phase Commands
-      1. Move to these numbers in Phase 2
-      2. Correction of detection in Phase 2
-      3. Determine the position moved to is correct in Phase 3
-   4. Extra Features
-      1. Enable Live feed
-      2. Enable Manual AOCS Control
-   5. Regular Pings - Verification
-2. CubeSat -> Ground
-   1. Data
-      1. Phase 1 Data - The sensor info
-      2. Phase 2 Data - Images, Detected numbers, Their Positions
-      3. Phase 3 Data - Current View Img, Relative Position, Final Position
-      4. At a Glance Data - The sensor info
-   2. Regular Pings - Confirmation
-   3. Extra Features
-      1. Provide image frames for video
-      2. Inform of AOCS position when AOCS Control is enabled
+1. `"status": ["sensor1", "sensor2", ...]` {from all possible inputs available at a glance}
+2. `"data": {"type_of_data": data}`  {for generic data ot part of the below}
+3. `"init": 1/2/3`
+4. `"response": 1/0`
+5. `"p2_info": {0: [AOCS POS], 1: [AOCS POS], ..., 9: [AOCS POS]}`
+6. `"p2_cmd": [digit1, digit2, ...]`
+7. `"p3_info": {"init": [img array], "final": [img array]}`
+8. `"img": [img_array]`
+9. `"optional": "live"/"manual"`
+10. `"shutdown": num_seconds`
+11. `"error": -1`
+
+And 2nd value of `get` - means it is a request of this kind of info
 
 The messages will be encrypted.
 

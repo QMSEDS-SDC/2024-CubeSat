@@ -1,0 +1,4 @@
+{
+    "GROUND_HOST": "ground-station.local",
+    "MAIN_PORT": 8080
+}
