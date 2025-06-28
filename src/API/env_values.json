@@ -1,4 +1,6 @@
 {
     "GROUND_HOST": "ground-station.local",
-    "MAIN_PORT": 8080
+    "MAIN_PORT": 8080,
+    "PRIVATE_KEY": 0,
+    "PUBLIC_KEY": 0
 }

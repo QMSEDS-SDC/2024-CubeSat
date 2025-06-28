@@ -27,45 +27,52 @@ class Server_Comms:
 
     def handle_client_connection(self, client_socket, addr):
         """
-        Manages client connection for a single client persistently (supports JSON)
+        Manages client connection for a single client persistently (supports JSON).
         """
         try:
-            # Persistency
+            client_socket.settimeout(10)
+            buffer = ""
+    
             while self.running:
                 try:
-                    # Should receive JSON - request from client
-                    data = client_socket.recv(1024).decode("utf-8")
-
-                    if not data:  # for disconnects
-                        break
-
-                    # parse message and send response
-                    try:
-                        json_message = json.loads(data)
-                        response = self.process_json_message(json_message, addr)
-                        self._send_json(client_socket, response)
-
-                        # should terminate if sent a disconnect command (will need to implement)
-                        if json_message.get("type") == "disconnect":
-                            break
-
-                    except json.JSONDecodeError:  # if not JSON
-                        error_response = {
-                            "type": "error",
-                            "message": "Not JSON",
-                            "received_data": data
-                        }
-                        self._send_json(client_socket, error_response)
-
-                except socket.timeout:  # continue as long as should
+                    chunk = client_socket.recv(1024).decode("utf-8")
+                    if not chunk:
+                        break  # Client disconnected
+                    
+                    buffer += chunk
+    
+                    while "\n" in buffer:
+                        msg, buffer = buffer.split("\n", 1)
+                        if msg.strip():
+                            try:
+                                json_message = json.loads(msg.strip())
+                                response = self.process_json_message(json_message, addr)
+                                self._send_json(client_socket, response)
+    
+                                if json_message.get("type") == "disconnect":
+                                    return  # Graceful client disconnect
+                            except json.JSONDecodeError:
+                                error_response = {
+                                    "type": "error",
+                                    "message": "Not JSON",
+                                    "received_data": msg
+                                }
+                                self._send_json(client_socket, error_response)
+    
+                except socket.timeout:
                     continue
-                except ConnectionResetError:  # break if connection reset error is triggered
+                except ConnectionResetError:
                     break
-
-        except Exception:  # if something else, close socket
+                
+        except Exception:
             pass
         finally:
-            client_socket.close()
+            try:
+                self.client_socket.shutdown(socket.SHUT_RDWR)
+            except Exception:
+                pass
+            self.client_socket.close()
+
 
     def process_json_message(self, json_message, client_addr):
         """
@@ -88,11 +95,10 @@ class Server_Comms:
         elif message_type == "init":
             phase = json_message.get("message", -1)
             if phase == -1:
-                if phase == -1:
-                    return {
-                        "type": "Error",
-                        "message": -1
-                    }
+                return {
+                    "type": "Error",
+                    "message": -1
+                }
             # first initiate code then do this, else return 0
             return {
                     "type": "response",
@@ -216,7 +222,7 @@ class Server_Comms:
         """
         try:
             # Remove newline delimiter - send pure JSON
-            json_string = json.dumps(data)
+            json_string = json.dumps(data) + "\n"  # newline delimited
             client_socket.sendall(json_string.encode("utf-8"))
         except Exception:
             pass
