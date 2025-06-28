@@ -1,16 +1,19 @@
-import ctypes
+import detumbling_control as dc
+from APILogs import apilogs
 
-class aocsapi:
-    # Initialising
-    def __init__(self):
-        self.lib = ctypes.CDLL("AOCS.so") # insert path of AOCS.so here
-        self.lib.RotationInsc.argtypes = [ctypes.c_double, ctypes.c_double]
-        self.lib.Returnangle.restype = ctypes.c_double
+logs = apilogs()
 
-    def RotationInsc(self, x, y):
-        self.lib.RotationInsc(x,y)
+def getangvel():
+    # returns angular velocity about the z axis
+    try:
+        output = dc.read_angular_velocity()
+        logs.addlog("Angular Velocity Request --- Value: " + str(output))
+        return output
+    except Exception as e:
+        logs.addlog("Error in getangvel: " + str(e))
+        return None
 
-   
-    def Returnangle(self):
-        angle = self.lib.Returnangle()
-        return angle
+def detumble():
+    # starts the detumbling process
+    logs.addlog("Detumbling Started")
+    dc.detumbling_control()
