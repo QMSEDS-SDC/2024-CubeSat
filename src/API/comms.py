@@ -44,24 +44,27 @@ class Server_Comms:
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
 
-        # format
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
+        # Prevent duplicate handlers
+        if not self.logger.handlers:
+            # Format
+            formatter = logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            )
 
-        # file handler for the console logs
-        log_file = os.path.join(log_dir, f"server_{datetime.now().strftime('%Y%m%d')}.log")
-        file_handler = logging.FileHandler(log_file)
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
+            # File handler for all logs
+            log_file = os.path.join(log_dir, f"server_{datetime.now().strftime('%Y%m%d')}.log")
+            file_handler = logging.FileHandler(log_file)
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.setFormatter(formatter)
 
-        # file handler for the error logs
-        error_file = os.path.join(log_dir, f"server_errors_{datetime.now().strftime('%Y%m%d')}.log")
-        error_handler = logging.FileHandler(error_file)
+            # Console handler
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.INFO)
+            console_handler.setFormatter(formatter)
 
-        # adds them to the logger
-        self.logger.addHandler(file_handler)
-        self.logger.addHandler(error_handler)
+            # Add handlers to logger
+            self.logger.addHandler(file_handler)
+            self.logger.addHandler(console_handler)
 
     def handle_client_connection(self, client_socket, addr):
         """
