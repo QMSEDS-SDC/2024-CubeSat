@@ -2,3 +2,4 @@ numpy==2.2.0
 opencv-contrib-python==4.10.0.84
 cryptography==45.0.4
 pyembedded==3.5
+psutil==7.0.0
