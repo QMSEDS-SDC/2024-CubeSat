@@ -22,8 +22,8 @@ class Server_Comms:
         with open(env_path, "r") as f:
             self.env = json.load(f)
 
-        send_port = self.env["SEND_PORT"]
-        local_ip = "127.0.0.1"
+        send_port = self.env["MAIN_PORT"]
+        local_ip = "0.0.0.0"  # as needs to accept from all interfaces
 
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # uses TCP, for IPv4 protocol
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -50,16 +50,14 @@ class Server_Comms:
         )
 
         # file handler for the console logs
-        log_file = os.path.join(log_dir, f"server_{datetime.now().strftime("%Y%m%d")}.log")
+        log_file = os.path.join(log_dir, f"server_{datetime.now().strftime('%Y%m%d')}.log")
         file_handler = logging.FileHandler(log_file)
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
 
         # file handler for the error logs
-        error_file = os.path.join(log_dir, f"server_errors_{datetime.now().strftime("%Y%m%d")}.log")
+        error_file = os.path.join(log_dir, f"server_errors_{datetime.now().strftime('%Y%m%d')}.log")
         error_handler = logging.FileHandler(error_file)
-        error_handler.setLevel(logging.ERROR)
-        error_handler.setFormatter(formatter)
 
         # adds them to the logger
         self.logger.addHandler(file_handler)
@@ -95,12 +93,12 @@ class Server_Comms:
 
                             try:
                                 json_message = json.loads(msg.strip())
-                                self.logger.info(f"Received {json_message.get("type", "unknown")} message from {client_id}")
+                                self.logger.info(f"Received {json_message.get('type', 'unknown')} message from {client_id}")
 
                                 response = self.process_json_message(json_message, addr)
                                 self._send_json(client_socket, response)
 
-                                self.logger.debug(f"Sent response to {client_id}: {response.get("type", "unknown")}")
+                                self.logger.debug(f"Sent response to {client_id}: {response.get('type', 'unknown')}")
 
                                 if json_message.get("type") == "disconnect":
                                     self.logger.info(f"Client {client_id} requested disconnect")
@@ -235,7 +233,7 @@ class Server_Comms:
                     # it should continuously update through its respective functions
                     command_success = True  # Replace with actual command execution
                     response[target] = 1 if command_success else 0
-                    self.logger.debug(f"P2 command for target {target}: {"success" if command_success else "failed"}")
+                    self.logger.debug(f"P2 command for target {target}: {'success' if command_success else 'failed'}")
 
                 self.logger.info(f"P2 command completed for {client_id}: {len(response)} targets processed")
                 return {
