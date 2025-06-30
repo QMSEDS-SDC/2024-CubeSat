@@ -1,0 +1,58 @@
+2025-06-30 14:59:54,113 - comms - DEBUG - Sent response to 10.63.215.45:46044: p3_info
+2025-06-30 14:59:55,112 - comms - DEBUG - Received data from 10.63.215.45:46044: 34 bytes
+2025-06-30 14:59:55,113 - comms - DEBUG - Processing message #6 from 10.63.215.45:46044: {"type": "img", "message": "get"}...
+2025-06-30 14:59:55,114 - comms - INFO - Received img message from 10.63.215.45:46044
+2025-06-30 14:59:55,114 - comms - DEBUG - Processing "img" message from 10.63.215.45:46044
+2025-06-30 14:59:55,114 - comms - INFO - Image request from 10.63.215.45:46044: get
+2025-06-30 14:59:55,115 - comms - INFO - Returning image data to 10.63.215.45:46044 (size: 0)
+2025-06-30 14:59:55,115 - comms - DEBUG - Sent JSON response: 31 bytes
+2025-06-30 14:59:55,123 - comms - DEBUG - Sent response to 10.63.215.45:46044: img
+2025-06-30 14:59:56,113 - comms - DEBUG - Received data from 10.63.215.45:46044: 36 bytes
+2025-06-30 14:59:56,113 - comms - DEBUG - Processing message #7 from 10.63.215.45:46044: {"type": "shutdown", "message": 10}...
+2025-06-30 14:59:56,114 - comms - INFO - Received shutdown message from 10.63.215.45:46044
+2025-06-30 14:59:56,114 - comms - DEBUG - Processing "shutdown" message from 10.63.215.45:46044
+2025-06-30 14:59:56,115 - comms - WARNING - Shutdown request from 10.63.215.45:46044 with delay: 10 seconds
+2025-06-30 14:59:56,115 - comms - CRITICAL - Shutdown scheduled in 10 seconds by 10.63.215.45:46044
+2025-06-30 14:59:56,116 - comms - DEBUG - Sent JSON response: 35 bytes
+2025-06-30 14:59:56,117 - comms - DEBUG - Sent response to 10.63.215.45:46044: response
+2025-06-30 14:59:57,111 - comms - DEBUG - Received data from 10.63.215.45:46044: 40 bytes
+2025-06-30 14:59:57,112 - comms - DEBUG - Processing message #8 from 10.63.215.45:46044: {"type": "optional", "message": "live"}...
+2025-06-30 14:59:57,112 - comms - INFO - Received optional message from 10.63.215.45:46044
+2025-06-30 14:59:57,113 - comms - DEBUG - Processing "optional" message from 10.63.215.45:46044
+2025-06-30 14:59:57,113 - comms - INFO - Optional feature request from 10.63.215.45:46044: live
+2025-06-30 14:59:57,114 - comms - INFO - Live feature requested by 10.63.215.45:46044
+2025-06-30 14:59:57,114 - comms - DEBUG - Sent JSON response: 35 bytes
+2025-06-30 14:59:57,115 - comms - DEBUG - Sent response to 10.63.215.45:46044: response
+2025-06-30 14:59:58,112 - comms - DEBUG - Received data from 10.63.215.45:46044: 42 bytes
+2025-06-30 14:59:58,112 - comms - DEBUG - Processing message #9 from 10.63.215.45:46044: {"type": "optional", "message": "manual"}...
+2025-06-30 14:59:58,113 - comms - INFO - Received optional message from 10.63.215.45:46044
+2025-06-30 14:59:58,113 - comms - DEBUG - Processing "optional" message from 10.63.215.45:46044
+2025-06-30 14:59:58,114 - comms - INFO - Optional feature request from 10.63.215.45:46044: manual
+2025-06-30 14:59:58,114 - comms - INFO - Manual mode requested by 10.63.215.45:46044
+2025-06-30 14:59:58,115 - comms - DEBUG - Sent JSON response: 35 bytes
+2025-06-30 14:59:58,115 - comms - DEBUG - Sent response to 10.63.215.45:46044: response
+2025-06-30 14:59:59,112 - comms - DEBUG - Received data from 10.63.215.45:46044: 48 bytes
+2025-06-30 14:59:59,113 - comms - DEBUG - Processing message #10 from 10.63.215.45:46044: {"type": "optional", "message": "invalid_mode"}...
+2025-06-30 14:59:59,114 - comms - INFO - Received optional message from 10.63.215.45:46044
+2025-06-30 14:59:59,114 - comms - DEBUG - Processing "optional" message from 10.63.215.45:46044
+2025-06-30 14:59:59,114 - comms - INFO - Optional feature request from 10.63.215.45:46044: invalid_mode
+2025-06-30 14:59:59,115 - comms - WARNING - Unknown optional feature from 10.63.215.45:46044: invalid_mode
+2025-06-30 14:59:59,115 - comms - DEBUG - Sent JSON response: 62 bytes
+2025-06-30 14:59:59,116 - comms - DEBUG - Sent response to 10.63.215.45:46044: Error
+2025-06-30 15:00:00,114 - comms - DEBUG - Received data from 10.63.215.45:46044: 39 bytes
+2025-06-30 15:00:00,115 - comms - DEBUG - Processing message #11 from 10.63.215.45:46044: {"type": "foo_bar", "message": "test"}...
+2025-06-30 15:00:00,116 - comms - INFO - Received foo_bar message from 10.63.215.45:46044
+2025-06-30 15:00:00,116 - comms - DEBUG - Processing "foo_bar" message from 10.63.215.45:46044
+2025-06-30 15:00:00,116 - comms - WARNING - Unknown message type from 10.63.215.45:46044: foo_bar
+2025-06-30 15:00:00,118 - comms - DEBUG - Sent JSON response: 62 bytes
+2025-06-30 15:00:00,118 - comms - DEBUG - Sent response to 10.63.215.45:46044: Error
+2025-06-30 15:00:01,115 - comms - DEBUG - Received data from 10.63.215.45:46044: 23 bytes
+2025-06-30 15:00:01,116 - comms - DEBUG - Processing message #12 from 10.63.215.45:46044: {"type": "disconnect"}...
+2025-06-30 15:00:01,116 - comms - INFO - Received disconnect message from 10.63.215.45:46044
+2025-06-30 15:00:01,116 - comms - DEBUG - Processing "disconnect" message from 10.63.215.45:46044
+2025-06-30 15:00:01,117 - comms - INFO - Disconnect request from 10.63.215.45:46044
+2025-06-30 15:00:01,118 - comms - DEBUG - Sent JSON response: 49 bytes
+2025-06-30 15:00:01,118 - comms - DEBUG - Sent response to 10.63.215.45:46044: response
+2025-06-30 15:00:01,118 - comms - INFO - Client 10.63.215.45:46044 requested disconnect
+2025-06-30 15:00:01,119 - comms - INFO - Closed connection to 10.63.215.45:46044
+2025-06-30 15:02:42,344 - comms - INFO - Server stopped listening
