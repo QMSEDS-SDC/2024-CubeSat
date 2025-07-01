@@ -59,3 +59,7 @@ Acts as a bridge between the API and data processing modules:
 - Executes commands received from the API.
 - Triggers data processing algorithms as needed.
 - Manages operational tasks and relays system status and data to the Ground Station.
+
+### Pre-requisite
+
+Enable I2C using `raspi-config` on the .
