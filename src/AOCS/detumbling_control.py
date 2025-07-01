@@ -37,6 +37,7 @@ pwm.start(0)                # Start with 0% duty cycle (motor off)
 # Initialise I2C
 bus = smbus.SMBus(I2C_BUS)
 
+
 # Initialise MPU9250
 def initialise_mpu9250():
     """Initialise the MPU9250 IMU"""
@@ -54,6 +55,7 @@ def initialise_mpu9250():
     except Exception as e:
         print(f"Failed to initialise MPU9250 IMU: {e}")
         return False
+
 
 # Read gyroscope data
 def read_gyro_data():
@@ -86,6 +88,7 @@ def read_gyro_data():
         print(f"Error reading gyroscope data: {e}")
         return {'x': 0, 'y': 0, 'z': 0}
 
+
 # Control Parameters
 Kp = 2.0  # Proportional gain - adjust based on your system's response
 Ki = 0.1  # Integral gain
@@ -98,6 +101,7 @@ alpha = 0.7  # Complementary filter coefficient (0 < alpha < 1)
 error_sum = 0
 last_error = 0
 filtered_gyro_z = 0
+
 
 def set_motor_direction(direction):
     """
@@ -114,6 +118,7 @@ def set_motor_direction(direction):
         GPIO.output(IN1, GPIO.LOW)
         GPIO.output(IN2, GPIO.LOW)
 
+
 def set_motor_speed(speed):
     """
     Sets the motor speed via PWM
@@ -123,6 +128,7 @@ def set_motor_speed(speed):
     speed = max(0, min(100, speed))
     pwm.ChangeDutyCycle(speed)
 
+
 def read_angular_velocity():
     """
     Reads angular velocity from the IMU
@@ -130,6 +136,7 @@ def read_angular_velocity():
     """
     gyro = read_gyro_data()
     return gyro['z']  # Extract z-axis angular velocity
+
 
 def detumbling_control():
     """
@@ -193,6 +200,7 @@ def detumbling_control():
         pwm.stop()
         GPIO.cleanup()
         print("GPIO cleaned up")
+
 
 if __name__ == "__main__":
     # Initialise the IMU
