@@ -20,6 +20,9 @@ class status:
         self.pi = PI()
         # self.camera = Camera()
         self.command = ["iw", "dev", "wlan0", "link"]
+        self.i2c = ExtendedI2C(3) # The number here indicated the extended I2C bus number. I think its 3 by default when you config it
+        self.ina219 = adafruit_ina219.INA219(i2c)
+
 
     # Checks if Pi is Detected
     def pi_detect(self, func):
