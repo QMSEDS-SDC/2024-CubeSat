@@ -1,7 +1,7 @@
 import time
 import smbus
 import RPi.GPIO as GPIO
-
+import numpy as np
 
 # Pin Configuration based on provided pin allocation
 # L298N Motor Driver Pins
@@ -34,28 +34,26 @@ GPIO.setup(IN2, GPIO.OUT)
 pwm = GPIO.PWM(ENA, 1000)  # 1000 Hz frequency
 pwm.start(0)                # Start with 0% duty cycle (motor off)
 
-# Initialise I2C
+# Initialize I2C
 bus = smbus.SMBus(I2C_BUS)
 
-
-# Initialise MPU9250
-def initialise_mpu9250():
-    """Initialise the MPU9250 IMU"""
+# Initialize MPU9250
+def initialize_mpu9250():
+    """Initialize the MPU9250 IMU"""
     try:
         # Wake up the MPU9250
         bus.write_byte_data(MPU9250_ADDR, PWR_MGMT_1, 0x00)
-
+        
         # Configure gyroscope range to ±250 degrees/s
         # 0x00 = 250 degrees/s, 0x08 = 500 degrees/s, 0x10 = 1000 degrees/s, 0x18 = 2000 degrees/s
         bus.write_byte_data(MPU9250_ADDR, GYRO_CONFIG, 0x00)
-
-        time.sleep(0.1)  # Allow time for device to stabilise
-        print("MPU9250 IMU initialised successfully")
+        
+        time.sleep(0.1)  # Allow time for device to stabilize
+        print("MPU9250 IMU initialized successfully")
         return True
     except Exception as e:
-        print(f"Failed to initialise MPU9250 IMU: {e}")
+        print(f"Failed to initialize MPU9250 IMU: {e}")
         return False
-
 
 # Read gyroscope data
 def read_gyro_data():
@@ -63,12 +61,12 @@ def read_gyro_data():
     try:
         # Read 6 bytes of data from register GYRO_XOUT_H
         data = bus.read_i2c_block_data(MPU9250_ADDR, GYRO_XOUT_H, 6)
-
+        
         # Convert the data
         gyro_x = (data[0] << 8) | data[1]
         gyro_y = (data[2] << 8) | data[3]
         gyro_z = (data[4] << 8) | data[5]
-
+        
         # Convert to signed values
         if gyro_x > 32767:
             gyro_x -= 65536
@@ -76,23 +74,22 @@ def read_gyro_data():
             gyro_y -= 65536
         if gyro_z > 32767:
             gyro_z -= 65536
-
+        
         # Convert to degrees per second (depends on the range set in GYRO_CONFIG)
         # For ±250 degrees/s range, sensitivity is 131 LSB/(degrees/s)
         gyro_x = gyro_x / 131.0
         gyro_y = gyro_y / 131.0
         gyro_z = gyro_z / 131.0
-
+        
         return {'x': gyro_x, 'y': gyro_y, 'z': gyro_z}
     except Exception as e:
         print(f"Error reading gyroscope data: {e}")
         return {'x': 0, 'y': 0, 'z': 0}
 
-
 # Control Parameters
-Kp = 2.0  # Proportional gain - adjust based on your system's response
+Kp = 0.8  # Proportional gain - adjust based on your system's response
 Ki = 0.1  # Integral gain
-Kd = 0.5  # Derivative gain
+Kd = 0.2  # Derivative gain
 
 # Filter parameters
 alpha = 0.7  # Complementary filter coefficient (0 < alpha < 1)
@@ -101,7 +98,6 @@ alpha = 0.7  # Complementary filter coefficient (0 < alpha < 1)
 error_sum = 0
 last_error = 0
 filtered_gyro_z = 0
-
 
 def set_motor_direction(direction):
     """
@@ -118,7 +114,6 @@ def set_motor_direction(direction):
         GPIO.output(IN1, GPIO.LOW)
         GPIO.output(IN2, GPIO.LOW)
 
-
 def set_motor_speed(speed):
     """
     Sets the motor speed via PWM
@@ -128,7 +123,6 @@ def set_motor_speed(speed):
     speed = max(0, min(100, speed))
     pwm.ChangeDutyCycle(speed)
 
-
 def read_angular_velocity():
     """
     Reads angular velocity from the IMU
@@ -137,46 +131,44 @@ def read_angular_velocity():
     gyro = read_gyro_data()
     return gyro['z']  # Extract z-axis angular velocity
 
-
 def detumbling_control():
     """
     Implements detumbling control to bring angular velocity to zero
     """
     global error_sum, last_error, filtered_gyro_z
-
+    
     try:
         print("Starting detumbling control mode...")
         print("Press Ctrl+C to stop")
-
+        
         # Control loop
         dt = 0.01  # 10ms control period
         while True:
             start_time = time.time()
-
+            
             # Read current angular velocity
             current_gyro_z = read_angular_velocity()
-
+            
             # Apply complementary filter to smooth readings
             filtered_gyro_z = alpha * filtered_gyro_z + (1 - alpha) * current_gyro_z
-
+            
             # Calculate error (desired angular velocity is zero)
             error = 0 - filtered_gyro_z
-
+            
             # Update integral term with anti-windup
             error_sum += error * dt
             error_sum = max(-50, min(50, error_sum))  # Limit integral term
-
+            
             # Calculate derivative term
             error_rate = (error - last_error) / dt if dt > 0 else 0
             last_error = error
-
+            
             # PID control output
             control_output = Kp * error + Ki * error_sum + Kd * error_rate
-
+            
             # Determine motor direction and speed
             if abs(control_output) < 5:
                 # Dead zone to prevent motor oscillation at low speeds
-                speed = 0
                 set_motor_direction(0)
                 set_motor_speed(0)
             else:
@@ -184,15 +176,15 @@ def detumbling_control():
                 speed = min(abs(control_output), 100)  # Limit to valid PWM range
                 set_motor_direction(direction)
                 set_motor_speed(speed)
-
+            
             # Debug output
             print(f"Angular Velocity: {filtered_gyro_z:.2f} deg/s, Control Output: {control_output:.2f}, PWM: {speed:.1f}%")
-
+            
             # Calculate loop time and sleep to maintain consistent dt
             elapsed = time.time() - start_time
             sleep_time = max(0, dt - elapsed)
             time.sleep(sleep_time)
-
+            
     except KeyboardInterrupt:
         print("Detumbling control stopped by user")
     finally:
@@ -201,16 +193,15 @@ def detumbling_control():
         GPIO.cleanup()
         print("GPIO cleaned up")
 
-
 if __name__ == "__main__":
-    # Initialise the IMU
-    if not initialise_mpu9250():
+    # Initialize the IMU
+    if not initialize_mpu9250():
         GPIO.cleanup()
         exit(1)
-
-    # Calibration period to let sensors stabilise
-    print("Initialising and calibrating sensors. Please keep the system stationary...")
+    
+    # Calibration period to let sensors stabilize
+    print("Initializing and calibrating sensors. Please keep the system stationary...")
     time.sleep(2)
-
+    
     # Run detumbling control
     detumbling_control()

@@ -1,3 +1,9 @@
+"""
+Server comms
+
+TODO: Integrate all the APIs (also use stuff in AOCS to make the API for it)
+"""
+
 import socket
 import json
 import os
