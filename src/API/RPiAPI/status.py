@@ -7,6 +7,10 @@ Refer to this video for reference: https://www.youtube.com/watch?v=znKICgLJZhI
 import subprocess
 from pyembedded.raspberry_pi_tools.raspberrypi import PI
 # from Camera import Camera
+import time
+import adafruit_ina219
+# Import extended bus library using 'pip3 install adafruit-extended-bus'
+from adafruit_extended_bus import ExtendedI2C
 
 
 class status:
@@ -16,6 +20,9 @@ class status:
         self.pi = PI()
         # self.camera = Camera()
         self.command = ["iw", "dev", "wlan0", "link"]
+        self.i2c = ExtendedI2C(3) # The number here indicated the extended I2C bus number. I think its 3 by default when you config it
+        self.ina219 = adafruit_ina219.INA219(i2c)
+
 
     # Checks if Pi is Detected
     def pi_detect(self, func):
@@ -95,6 +102,18 @@ class status:
     def pi_wifi_tx_bitrate(self):
         x = self.parse_info(self.run_command(self.command), 2)
         return x  # returns wifi tx bitrate in Mbps
+
+    def GetVoltage(self):
+        x = self.ina219.voltage # Voltage in V
+        return x
+        
+    def GetCurrent(self):
+        x = self.ina219.current / 1000  # Convert mA to A 
+        return x
+        
+    def GetPower(self):
+        x = self.ina219.power / 1000  # Convert mW to W 
+        return x
 
     """
     # returns camera status
