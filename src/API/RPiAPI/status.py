@@ -20,9 +20,8 @@ class status:
         self.pi = PI()
         # self.camera = Camera()
         self.command = ["iw", "dev", "wlan0", "link"]
-        self.i2c = ExtendedI2C(3) # The number here indicated the extended I2C bus number. I think its 3 by default when you config it
+        self.i2c = ExtendedI2C(3)  # The number here indicated the extended I2C bus number. I think its 3 by default when you config it
         self.ina219 = adafruit_ina219.INA219(i2c)
-
 
     # Checks if Pi is Detected
     def pi_detect(self, func):
@@ -104,15 +103,15 @@ class status:
         return x  # returns wifi tx bitrate in Mbps
 
     def GetVoltage(self):
-        x = self.ina219.voltage # Voltage in V
+        x = self.ina219.voltage  # Voltage in V
         return x
         
     def GetCurrent(self):
-        x = self.ina219.current / 1000  # Convert mA to A 
+        x = self.ina219.current / 1000  # Convert mA to A
         return x
         
     def GetPower(self):
-        x = self.ina219.power / 1000  # Convert mW to W 
+        x = self.ina219.power / 1000  # Convert mW to W
         return x
 
     """

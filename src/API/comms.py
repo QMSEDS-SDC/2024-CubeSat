@@ -10,6 +10,7 @@ import os
 import threading
 import logging
 from datetime import datetime
+from RPiAPI.status import status
 
 
 class Server_Comms:
@@ -30,6 +31,7 @@ class Server_Comms:
 
         send_port = self.env["MAIN_PORT"]
         local_ip = "0.0.0.0"  # as needs to accept from all interfaces
+        self.status_monitor = status()
 
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # uses TCP, for IPv4 protocol
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -153,42 +155,53 @@ class Server_Comms:
 
         try:
             if message_type == "status":
-                sensors = json_message.get("message", [])
-                self.logger.info(f"Status request from {client_id} for sensors: {sensors}")
+                if message_type == "status":
+                    sensors = json_message.get("message", [])
+                    self.logger.info(f"Status request from {client_id} for sensors: {sensors}")
 
-                response = []
-                # TODO: Replace with actual sensor reading functions
-                for sensor in sensors:
-                    # Placeholder: here put code to fetch the sensor info and forward it back
-                    sensor_data = {
-                        "sensor_id": sensor,
-                        "value": 0,  # Replace with actual reading
-                        "status": "ok",
-                        "timestamp": datetime.now().isoformat()
+                    response = self._get_system_status(sensors)
+
+                    self.logger.debug(f"Returning status data for {len(response)} sensors to {client_id}")
+                    return {
+                        "type": "status",
+                        "message": response
                     }
-                    response.append(sensor_data)
-
-                self.logger.debug(f"Returning status data for {len(response)} sensors to {client_id}")
-                return {
-                    "type": "status",
-                    "message": response
-                }
 
             elif message_type == "init":
                 phase = json_message.get("message", -1)
                 self.logger.info(f"Init request from {client_id} for phase {phase}")
-
+    
                 if phase == -1:
                     self.logger.warning(f"Invalid phase in init request from {client_id}")
                     return {
                         "type": "Error",
                         "message": "Invalid phase number"
                     }
-
-                # TODO: Replace with actual initialization code
-                # first initiate code then do this, else return 0
-                init_success = True  # Replace with actual initialization logic
-
+    
+                # Use FSM to initiate phase
+                if hasattr(self, 'fsm'):
+                    try:
+                        if phase == 1:
+                            # Start phase 1 in a separate thread
+                            phase_thread = threading.Thread(target=self.fsm.phase1, daemon=True)
+                            phase_thread.start()
+                            init_success = True
+                        elif phase == 2:
+                            phase_thread = threading.Thread(target=self.fsm.phase2, daemon=True)
+                            phase_thread.start()
+                            init_success = True
+                        elif phase == 3:
+                            phase_thread = threading.Thread(target=self.fsm.phase3, daemon=True)
+                            phase_thread.start()
+                            init_success = True
+                        else:
+                            init_success = False
+                    except Exception as e:
+                        self.logger.error(f"Error initiating phase {phase}: {e}")
+                        init_success = False
+                else:
+                    init_success = False
+    
                 if init_success:
                     self.logger.info(f"Successfully initialized phase {phase} for {client_id}")
                     return {
@@ -200,6 +213,20 @@ class Server_Comms:
                     return {
                         "type": "Error",
                         "message": "Initialization failed"
+                    }
+    
+            elif message_type == "telemetry":
+                # New message type for getting telemetry data
+                if hasattr(self, 'fsm'):
+                    telemetry_data = self.fsm.get_telemetry_data()
+                    return {
+                        "type": "telemetry",
+                        "message": telemetry_data
+                    }
+                else:
+                    return {
+                        "type": "Error",
+                        "message": "FSM not available"
                     }
 
             elif message_type == "p2_info":
@@ -357,6 +384,77 @@ class Server_Comms:
                 "type": "Error",
                 "message": f"Internal server error: {str(e)}"
             }
+
+    def _get_system_status(self, requested_sensors=None):
+        """
+        Get comprehensive system status using RPiAPI
+        """
+        status_data = {}
+        
+        try:
+            # Power Subsystem
+            status_data["power"] = {
+                "battery_voltage": self.status_monitor.GetVoltage(),
+                "battery_current": self.status_monitor.GetCurrent(),
+                "battery_power": self.status_monitor.GetPower(),
+                "status": "NOMINAL" if self.status_monitor.GetVoltage() > 3.0 else "CRITICAL"
+            }
+            
+            # Thermal Subsystem
+            cpu_temp = self.status_monitor.pi_temp()
+            status_data["thermal"] = {
+                "cpu_temperature": cpu_temp,
+                "status": "OK" if isinstance(cpu_temp, (int, float)) and cpu_temp < 70 else "WARNING"
+            }
+            
+            # Communication Subsystem
+            wifi_strength = self.status_monitor.pi_wifi_strength()
+            wifi_freq = self.status_monitor.pi_wifi_freq()
+            wifi_bitrate = self.status_monitor.pi_wifi_tx_bitrate()
+            wifi_quality = self.status_monitor.pi_wifi_quality()
+            
+            status_data["communication"] = {
+                "wifi_strength": wifi_strength,
+                "wifi_frequency": wifi_freq,
+                "wifi_bitrate": wifi_bitrate,
+                "wifi_quality": wifi_quality,
+                "status": "OK" if isinstance(wifi_quality, (int, float)) and wifi_quality > 50 else "WARNING"
+            }
+            
+            # Command and Data Handling
+            cpu_usage = self.status_monitor.pi_use()
+            disk_usage = self.status_monitor.pi_disk()
+            used_ram = self.status_monitor.pi_used_ram()
+            free_ram = self.status_monitor.pi_free_ram()
+            
+            status_data["cdh"] = {
+                "cpu_usage": cpu_usage,
+                "disk_usage": disk_usage,
+                "memory_used": used_ram,
+                "memory_free": free_ram,
+                "status": "OK" if isinstance(cpu_usage, (int, float)) and cpu_usage < 80 else "WARNING"
+            }
+            
+            # Camera/Payload status
+            status_data["payload"] = {
+                "camera_available": True,  # Will be updated by FSM
+                "status": "OK"
+            }
+            
+            # ADCS - placeholder for now (to be integrated with AOCS)
+            status_data["adcs"] = {
+                "gyroscope": {"x": 0, "y": 0, "z": 0},
+                "orientation": {"x": 0, "y": 0, "z": 0},
+                "sun_sensor": False,
+                "reaction_wheel_rpm": 0,
+                "status": "NOT OK"
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Error getting system status: {e}")
+            status_data["error"] = str(e)
+        
+        return status_data
 
     def _send_json(self, client_socket, data):
         """

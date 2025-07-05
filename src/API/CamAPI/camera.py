@@ -5,6 +5,7 @@ import numpy as np
 from threading import Thread, Event
 import queue
 import time
+import os
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -205,3 +206,29 @@ class Camera:
     def is_streaming(self):
         """Check if camera is currently streaming"""
         return self.streaming
+
+if __name__ == "__main__":
+    # Get the directory where the script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    cam = None
+    try:
+        cam = Camera(width=640, height=480)
+        if cam.start_streaming():
+            print("Camera streaming started. Capturing 10 frames...")
+            for i in range(10):
+                frame = cam.get_frame(timeout=2.0)
+                if frame is not None:
+                    filename = os.path.join(script_dir, f"frame_{i+1}.jpg")
+                    cv2.imwrite(filename, frame)
+                    print(f"Saved {filename}")
+                else:
+                    print(f"Frame {i+1} not available.")
+            cam.stop_streaming()
+            print("Camera streaming stopped.")
+        else:
+            print("Failed to start camera streaming.")
+    except CameraNotFound as e:
+        print(f"Camera error: {e}")
+    finally:
+        if cam and cam.is_streaming():
+            cam.stop_streaming()
