@@ -4,16 +4,18 @@ The FSM code that the CubeSat will run
 
 import torch
 import torch.nn as nn
-
+import threading
 import numpy as np
 import cv2
+
 from dataprocessing.model.train import CNN
 import dataprocessing.processing.image_preprocessing as preimg
 import dataprocessing.processing.detect_cards as cd
 import dataprocessing.processing.detect_tag as arucod
-import API.comms
+from API.comms import Server_Comms
 import AOCS.detumbling_control as detumble
 import AOCS.aocs_control as ctl
+from AOCS.camera import Camera
 
 
 # Constants
@@ -31,27 +33,53 @@ class FSM:
     def __init__(self):
         """
         Initialses the stuff
+
+        starts comms, creates all the objects needed for the phases and turns into default
         """
+        self.server = Server_Comms()
+        self.server.start_listening(size_client_queue=2)
+        self.cam = Camera()
+        self.model = CNN()
+        self.model.load_state_dict(torch.load(digit_recorgnition_model, weights_only=True))
+
+        self.default()
+
+    def _digit_guesser(self, img: np.ndarray):
+        self.model.eval()
+        img = torch.tensor(img)
+        prediction = -1
+        with torch.no_grad():
+            outputs = self.model(img)
+            _, predicted = torch.max(outputs.data, 1)
+            prediction.extend(predicted.cpu().numpy())
+        return prediction
+
+    def _pings(self):
         pass
 
-    def default_init(self):
+    def default(self):
         """
         Initates the Default state the cubesat should be in
-        """
 
-    def phase1_init(self):
-        """
-        Initiates Phase 1
+        send regular pings + wait for command to initiate some phase
         """
         pass
 
-    def phase2_init(self):
+    def phase1(self):
+        """
+        Initiates Phase 1
+
+        run health check stuff and goes back to default
+        """
+        pass
+
+    def phase2(self):
         """
         Initiate Phase 2
         """
         pass
 
-    def phase3_init(self):
+    def phase3(self):
         """
         Initiate Phase 3
         """
